@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Examen blanc : Les puissances</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f9ff;--ink:#1f2350;--card:#fff;--line:#d3def5;--mut:#5b6190;--acc:#4b3fd6;--onacc:#fff;--ok:#1a8a5a;--ko:#c93a4f;--wn:#d9822b;--mg:#e8708a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12142b;--ink:#e6e9ff;--card:#1b1e3d;--line:#2b3060;--mut:#9aa1d6;--acc:#9d93ff;--onacc:#14163a;--ok:#4cd493;--ko:#ff7d90;--wn:#f0a458;--mg:#b4506a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12142b;--ink:#e6e9ff;--card:#1b1e3d;--line:#2b3060;--mut:#9aa1d6;--acc:#9d93ff;--onacc:#14163a;--ok:#4cd493;--ko:#ff7d90;--wn:#f0a458;--mg:#b4506a;color-scheme:dark}
+html{scroll-padding-top:calc(90px + env(safe-area-inset-top,0px))}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system-ui,sans-serif;background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:"Bricolage Grotesque",Nunito,sans-serif;margin:0;line-height:1.15}
+main{max-width:740px;margin:0 auto;padding:20px 18px 80px 34px;border-left:2px solid var(--mg);min-height:100vh;background:linear-gradient(90deg,var(--bg),transparent 0)}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0}
+button{font:inherit;font-weight:800;border:0;border-radius:10px;padding:12px 22px;background:var(--acc);color:var(--onacc);cursor:pointer}
+button.alt{background:transparent;color:var(--acc);border:2px solid var(--acc)}
+button:focus-visible,input:focus-visible,label:focus-within{outline:3px solid var(--wn);outline-offset:2px}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;background:var(--card);border-bottom:2px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px}
+#clk{font:800 28px "Bricolage Grotesque",sans-serif;font-variant-numeric:tabular-nums}
+#clk.w{color:var(--ko)}
+.sm{color:var(--mut);font-size:14px}
+.pt{background:var(--acc);color:var(--onacc);border-radius:99px;padding:1px 10px;font-size:13px;font-weight:800;white-space:nowrap}
+.q{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px 18px;margin:12px 0}
+.q .h{display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;font-weight:800}
+.q.good{border-left:6px solid var(--ok)}.q.bad{border-left:6px solid var(--ko)}
+.opt{display:block;padding:9px 12px;margin:6px 0;border:1.5px solid var(--line);border-radius:9px;cursor:pointer}
+.opt:has(input:checked){border-color:var(--acc);background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.opt input{margin-right:8px;accent-color:var(--acc)}
+input[type=text]{font:inherit;width:100%;max-width:340px;padding:9px 12px;border:2px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.2;margin:0 .2em}
+.fr i{font-style:normal;padding:0 .25em}.fr i:first-child{border-bottom:1.5px solid currentColor}
+sup{font-size:.7em}
+.ex{color:var(--mut);font-size:15px;margin-top:6px}
+.big{font:800 64px "Bricolage Grotesque",sans-serif;color:var(--acc);line-height:1}
+.bar2{height:14px;background:var(--line);border-radius:8px;overflow:hidden;margin:4px 0 2px}
+.bar2 b{display:block;height:100%}
+.row{display:flex;justify-content:space-between;gap:10px;font-weight:800}
+#msg{color:var(--wn);font-weight:800;margin:10px 0}
+ul{padding-left:20px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const $=s=>document.querySelector(s);
+const R=a=>a[Math.floor(Math.random()*a.length)];
+const sh=a=>a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const M=s=>String(s).replace(/-/g,"−");
+const P=(b,e)=>`${b<0?`(−${-b})`:b}<sup>${M(e)}</sup>`;
+const fr=(t,d)=>`<span class="fr"><i>${t}</i><i>${d}</i></span>`;
+const dec=v=>String(v).replace(".",",").replace("-","−");
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const C=(part,pts,html,ok,bad,expl)=>{const o=sh([ok,...bad]);return{part,pts,html,t:"c",opts:o,ans:o.indexOf(ok),show:ok,expl}};
+const N=(part,pts,html,val,show,expl,tol=1e-9)=>({part,pts,html,t:"n",val,show,expl,tol});
+const W=(part,pts,html,ans,show,expl)=>({part,pts,html,t:"p",ans,show,expl});
+const PARTS=["Définition des puissances","Exposants négatifs et inverses","Cas particuliers (exposants 0 et 1)","Puissances de 10"];
+const TIPS=[
+`aⁿ est le produit de n facteurs égaux à a. Attention aux signes : (−2)³ = (−2)×(−2)×(−2) = −8.`,
+`a<sup>−n</sup> = 1/aⁿ (a ≠ 0). C’est l’inverse de aⁿ, pas un nombre négatif.`,
+`a¹ = a et a⁰ = 1 (a ≠ 0). a² se lit « a au carré », a³ « a au cube ».`,
+`10ⁿ s’écrit avec n zéros après le 1. 10<sup>−n</sup> = 0,0…01 avec le 1 en n-ième position derrière la virgule.`];
+const MEN=s=>s>=16?"Très bien 🎉":s>=14?"Bien 👏":s>=12?"Assez bien 👍":s>=10?"Passable : tu y es presque":"À retravailler, mais tu vas progresser";
+function gen(){
+ const q=[];
+ let b=R([2,3,4,5,7]),n=R([4,5]);
+ q.push(C(0,1,`Le produit ${Array(n).fill(`(−${b})`).join(" × ")} s’écrit :`,P(-b,n),[P(b,n),P(-n,b),P(-b,n-1)],`${n} facteurs tous égaux à (−${b}) : on écrit ${P(-b,n)}.`));
+ b=R([2,3,4,5,6]);let e=R([2,3,4]);
+ q.push(N(0,2,`Calcule ${P(b,e)}.`,b**e,b**e,`${P(b,e)} = ${Array(e).fill(b).join(" × ")} = ${b**e}.`));
+ b=R([-2,-3]);e=R([3,4,5]);
+ q.push(N(0,2,`Calcule ${P(b,e)}.`,b**e,dec(b**e),`${P(b,e)} = ${Array(e).fill(`(−${-b})`).join(" × ")} = ${dec(b**e)}.`));
+ q.push(C(1,1,`Pour a ≠ 0 et n ≥ 2, a<sup>−n</sup> est égal à :`,`${fr(1,"aⁿ")}`,[`−aⁿ`,`−n × a`,`aⁿ`],`a<sup>−n</sup> est l’inverse de aⁿ : a<sup>−n</sup> = 1/aⁿ.`));
+ b=R([2,3,4,5,6,7]);n=R([2,3,4]);
+ q.push(W(1,2,`Écris ${fr(1,Array(n).fill(b).join("×"))} sous la forme d’une puissance de ${b}.<div class="sm">Pour taper « 5 exposant 2 », écris 5^2.</div>`,`${b}^-${n}`,`${b}^-${n}`,`${fr(1,Array(n).fill(b).join(" × "))} = ${fr(1,P(b,n))} = ${P(b,-n)}.`));
+ const L=[[2,1],[4,1],[5,1],[-2,1],[-3,1],[2,2],[2,3],[5,2]];const [lb,ln]=R(L);
+ const d=lb**ln,v=1/d,ex=Math.abs(Math.round(v*1000)/1000-v)<1e-12;
+ const fs=d<0?`−1/${-d}`:`1/${d}`;
+ q.push(N(1,2,`Calcule ${P(lb,-ln)}. Donne une fraction ou un nombre décimal.`,v,ex?dec(v):fs,`${P(lb,-ln)} = 1/${P(lb,ln)} = ${fs}${ex?" = "+dec(v):""}.`,ex?1e-9:0.004));
+ b=R([2,3,5,10]);e=R([2,3]);
+ q.push(C(1,1,`Vrai ou faux : ${P(b,-e)} est un nombre négatif.`,"Faux",["Vrai"],`L’exposant négatif ne rend pas le nombre négatif : ${P(b,-e)} = ${fr(1,b**e)}, qui est positif.`));
+ b=R([15,7,123,9,-4,-8]);
+ q.push(N(2,1,`Calcule ${P(b,0)}.`,1,1,`Par convention, a⁰ = 1 pour tout a ≠ 0.`));
+ b=R([-3,-7,12,-25,9]);
+ q.push(N(2,1,`Calcule ${P(b,1)}.`,b,dec(b),`a¹ = a, donc ${P(b,1)} = ${dec(b)}.`));
+ q.push(R([0,1])?C(2,1,`Pour tout nombre a ≠ 0, quelle égalité est vraie ?`,`a⁰ = 1`,[`a⁰ = 0`,`a¹ = 1`,`a⁰ = a`],`Par convention a⁰ = 1, et a¹ = a.`):C(2,1,`a × a × a se note a³ et se lit :`,`« a au cube »`,[`« a au carré »`,`« 3 exposant a »`,`« a fois 3 »`],`a × a × a = a³, qui se lit « a au cube » (a² : « a au carré »).`));
+ let k=R([3,4,5,6,9]);
+ q.push(N(3,1,`Écris 10<sup>${k}</sup> sous la forme d’un nombre entier.`,10**k,"1"+"0".repeat(k),`10<sup>${k}</sup> = 1 suivi de ${k} zéros.`));
+ k=R([2,3,4,5]);
+ q.push(N(3,2,`Écris ${P(10,-k)} sous forme décimale.`,10**-k,dec(10**-k),`${P(10,-k)} = ${fr(1,"1"+"0".repeat(k))} = ${dec(10**-k)} : le 1 est en position ${k} derrière la virgule.`));
+ const U=R([[3,"1 000"],[6,"1 000 000"],[9,"1 000 000 000"]]);
+ q.push(W(3,1,`Écris ${U[1]} sous la forme d’une puissance de 10.<div class="sm">Pour taper « 10 exposant 2 », écris 10^2.</div>`,`10^${U[0]}`,`10^${U[0]}`,`${U[1]} s’écrit avec ${U[0]} zéros : c’est 10<sup>${U[0]}</sup>.`));
+ k=R([2,3,4]);const z=dec(10**-k);
+ q.push(C(3,1,`${z} s’écrit :`,P(10,-k),[P(10,k),P(10,-(k-1)),P(10,-(k+1))],`Le 1 est en position ${k} derrière la virgule : ${z} = ${P(10,-k)}.`));
+ const T=R([[P(10,-2),"un centième"],[P(10,-3),"un millième"],[P(10,3),"un millier"],[P(10,6),"un million"],[P(10,9),"un milliard"]]);
+ const nm=["un centième","un millième","un millier","un million","un milliard"].filter(x=>x!==T[1]);
+ q.push(C(3,1,`${T[0]} correspond à :`,T[1],sh(nm).slice(0,3),`${T[0]} = ${T[1]}.`));
+ return q;
+}
+function pn(s){s=String(s).replace(/[\s\u00a0\u202f]/g,"").replace(",",".").replace(/[−–]/g,"-");if(!s)return NaN;const m=s.split("/");if(m.length==2)return Number(m[0])/Number(m[1]);return m.length==1?Number(s):NaN}
+const nm=s=>String(s).toLowerCase().replace(/[\s(){}]/g,"").replace(/\*\*/g,"^").replace(/[−–]/g,"-");
+function ok(q,v){if(v===null||v==="")return false;return q.t=="c"?v===q.ans:q.t=="n"?Math.abs(pn(v)-q.val)<=q.tol:nm(v)===q.ans}
+const DUR=2400;let qs,ans,t0,tid,conf;
+const hist=()=>{try{return JSON.parse(localStorage.getItem("aya_h")||"[]")}catch(e){return[]}};
+const save=r=>{try{localStorage.setItem("aya_h",JSON.stringify([...hist(),r].slice(-10)))}catch(e){}};
+function intro(){
+ const h=hist();
+ $("#app").innerHTML=`<main><h1>Examen blanc<br>Les puissances</h1><p class="sm">Pour Aya · 3<sup>e</sup></p>
+ <div class="card"><h3>Comme en vrai</h3><ul><li>Durée : <b>40 minutes</b>. Quand le temps est écoulé, la copie est rendue automatiquement.</li><li>15 questions, notées sur <b>20 points</b> (barème affiché à chaque question).</li><li>Sans calculatrice, sans cours. Lis bien chaque énoncé.</li><li>À la fin : ta note, ton score en % par partie du cours et la correction détaillée.</li><li>Les nombres changent à chaque tentative : refais l’examen pour progresser.</li></ul></div>
+ ${h.length?`<div class="card"><h3>Tes tentatives</h3>${h.map((r,i)=>`<div class="row"><span>Tentative ${i+1} · ${r.d}</span><span>${r.s}/20</span></div>`).join("")}</div>`:""}
+ <button onclick="start()">Commencer l’examen</button></main>`;
+}
+function start(){qs=gen();ans=qs.map(()=>null);conf=false;t0=Date.now();clearInterval(tid);tid=setInterval(tick,500);exam();window.scrollTo(0,0)}
+function exam(){
+ let last=-1,html="";
+ qs.forEach((q,i)=>{
+  if(q.part!==last){last=q.part;const mx=qs.filter(x=>x.part==q.part).reduce((a,x)=>a+x.pts,0);html+=`<h2 style="margin-top:28px">Partie ${"ABCD"[q.part]} : ${PARTS[q.part]} <span class="pt">${mx} pts</span></h2>`}
+  html+=`<div class="q"><div class="h"><span>Question ${i+1}</span><span class="pt">${q.pts} pt${q.pts>1?"s":""}</span></div><div>${q.html}</div>`+
+  (q.t=="c"?q.opts.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" onchange="ans[${i}]=${j};prog()">${o}</label>`).join(""):`<input type="text" aria-label="Réponse question ${i+1}" autocomplete="off" oninput="ans[${i}]=this.value;prog()" style="margin-top:8px">`)+`</div>`;
+ });
+ $("#app").innerHTML=`<header class="bar"><div><b>Examen blanc</b><div class="sm" id="pg"></div></div><div id="clk">40:00</div></header><main>${html}<div id="msg" role="status"></div><button onclick="sub()">Rendre ma copie</button></main>`;
+ prog();tick();
+}
+const miss=()=>ans.filter(a=>a===null||a==="").length;
+function prog(){conf=false;const e=$("#msg");if(e)e.textContent="";$("#pg").textContent=`${qs.length-miss()} / ${qs.length} questions répondues`}
+function tick(){const l=Math.max(0,DUR-Math.floor((Date.now()-t0)/1000));const c=$("#clk");if(!c)return;c.textContent=String(Math.floor(l/60)).padStart(2,"0")+":"+String(l%60).padStart(2,"0");c.className=l<=300?"w":"";if(l<=0)finish(true)}
+function sub(){if(miss()>0&&!conf){conf=true;$("#msg").textContent=`Il reste ${miss()} question(s) sans réponse. Appuie encore sur « Rendre ma copie » pour confirmer.`;return}finish(false)}
+function finish(auto){
+ clearInterval(tid);
+ const used=Math.min(DUR,Math.floor((Date.now()-t0)/1000));
+ const res=qs.map((q,i)=>ok(q,ans[i]));
+ const got=[0,0,0,0],mx=[0,0,0,0];
+ qs.forEach((q,i)=>{mx[q.part]+=q.pts;if(res[i])got[q.part]+=q.pts});
+ const s=got.reduce((a,b)=>a+b,0),pc=got.map((g,i)=>Math.round(100*g/mx[i]));
+ const h=hist(),prev=h.length?h[h.length-1].s:null;
+ save({d:new Date().toLocaleDateString("fr-FR"),s,pc});
+ const col=p=>p>=80?"var(--ok)":p>=50?"var(--wn)":"var(--ko)";
+ const lab=p=>p>=80?"Solide":p>=50?"Presque, à consolider":"À revoir en priorité";
+ const order=pc.map((p,i)=>i).sort((a,b)=>pc[a]-pc[b]);
+ const weak=order.filter(i=>pc[i]<80);
+ $("#app").innerHTML=`<main><h1>Ta copie corrigée</h1>
+ ${auto?`<p style="color:var(--ko);font-weight:800">Temps écoulé : la copie a été rendue automatiquement.</p>`:""}
+ <div class="card"><div class="big">${s}<span style="font-size:32px">/20</span></div><h3 style="margin-top:6px">${MEN(s)}</h3>
+ <p class="sm">Temps utilisé : ${Math.floor(used/60)} min ${used%60} s${prev!==null?` · Tentative précédente : ${prev}/20 (${s-prev>=0?"+":""}${s-prev})`:""}</p></div>
+ <h2>Ton score par partie</h2>
+ ${pc.map((p,i)=>`<div class="card" style="margin:10px 0"><div class="row"><span>${PARTS[i]}</span><span style="color:${col(p)}">${p} %</span></div><div class="bar2"><b style="width:${p}%;background:${col(p)}"></b></div><div class="sm">${got[i]}/${mx[i]} pts · ${lab(p)}</div></div>`).join("")}
+ <div class="card"><h3>Ce qu’il faut retravailler</h3>${weak.length?`<ul>${weak.map(i=>`<li><b>${PARTS[i]}</b> (${pc[i]} %) : ${TIPS[i]}</li>`).join("")}</ul>`:`<p>Toutes les parties sont solides. Bravo !</p>`}</div>
+ <h2>Correction détaillée</h2>
+ ${qs.map((q,i)=>{const y=ans[i],ys=y===null||y===""?"(pas de réponse)":q.t=="c"?q.opts[y]:esc(y);
+  return `<div class="q ${res[i]?"good":"bad"}"><div class="h"><span>${res[i]?"✓":"✗"} Question ${i+1}</span><span class="pt">${res[i]?q.pts:0}/${q.pts}</span></div><div>${q.html.replace(/<div class="sm">.*?<\/div>/,"")}</div><div class="sm">Ta réponse : ${ys}</div>${res[i]?"":`<div>Bonne réponse : <b>${q.show}</b></div>`}<div class="ex">${q.expl}</div></div>`}).join("")}
+ <button onclick="start()">Refaire un examen (nouvelles valeurs)</button> <button class="alt" onclick="intro()">Accueil</button></main>`;
+ window.scrollTo(0,0);
+}
+intro();
+</script>
+</body>
+</html>
